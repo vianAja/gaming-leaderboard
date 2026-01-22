@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gaming Leaderboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #111F35 0%, #1a2d4d 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(17, 31, 53, 0.8);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            max-width: 800px;
+            width: 100%;
+            border: 2px solid rgba(246, 48, 73, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 3em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #F63049, #D02752);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(246, 48, 73, 0.5);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #8A244B;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #F63049, #D02752);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(246, 48, 73, 0.4);
+            font-weight: bold;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(246, 48, 73, 0.6);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .leaderboard {
+            background: rgba(138, 36, 75, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(138, 36, 75, 0.3);
+        }
+
+        .leaderboard-header {
+            display: grid;
+            grid-template-columns: 60px 1fr 100px;
+            gap: 15px;
+            padding: 15px;
+            background: rgba(138, 36, 75, 0.3);
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-weight: bold;
+            color: #F63049;
+        }
+
+        .leaderboard-item {
+            display: grid;
+            grid-template-columns: 60px 1fr 100px;
+            gap: 15px;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: rgba(17, 31, 53, 0.6);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .leaderboard-item:hover {
+            background: rgba(138, 36, 75, 0.2);
+            border-color: rgba(246, 48, 73, 0.5);
+            transform: translateX(5px);
+        }
+
+        .rank {
+            font-size: 1.5em;
+            font-weight: bold;
+            text-align: center;
+            color: #F63049;
+        }
+
+        .rank-1 .rank {
+            color: #FFD700;
+            text-shadow: 0 0 10px #FFD700;
+        }
+
+        .rank-2 .rank {
+            color: #C0C0C0;
+        }
+
+        .rank-3 .rank {
+            color: #CD7F32;
+        }
+
+        .player {
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+        }
+
+        .score {
+            font-size: 1.3em;
+            font-weight: bold;
+            text-align: right;
+            color: #D02752;
+        }
+
+        .winner {
+            background: linear-gradient(135deg, rgba(246, 48, 73, 0.3), rgba(208, 39, 82, 0.3));
+            border: 2px solid #F63049;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 20px rgba(246, 48, 73, 0.5);
+            }
+            50% {
+                box-shadow: 0 0 40px rgba(246, 48, 73, 0.8);
+            }
+        }
+
+        .winner-badge {
+            display: inline-block;
+            background: #FFD700;
+            color: #111F35;
+            padding: 5px 15px;
+            border-radius: 15px;
+            margin-left: 10px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #8A244B;
+            font-size: 1.2em;
+        }
+
+        .status {
+            text-align: center;
+            margin-top: 20px;
+            color: #8A244B;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎮 GAMING LEADERBOARD 🏆</h1>
+        <div class="subtitle">Live Tournament Standings</div>
+        
+        <div class="controls">
+            <button onclick="resetLeaderboard()">🔄 Reset Scores</button>
+        </div>
+
+        <div class="leaderboard">
+            <div class="leaderboard-header">
+                <div>RANK</div>
+                <div>PLAYER</div>
+                <div>SCORE</div>
+            </div>
+            <div id="leaderboard-content">
+                <div class="empty-state">Waiting for players...</div>
+            </div>
+        </div>
+
+        <div class="status" id="status">Auto-refreshing every 2 seconds</div>
+    </div>
+
+    <script>
+        let refreshInterval;
+
+        async function fetchLeaderboard() {
+            try {
+                const response = await fetch('/api/leaderboard');
+                const data = await response.json();
+                
+                const content = document.getElementById('leaderboard-content');
+                
+                if (data.length === 0) {
+                    content.innerHTML = '<div class="empty-state">Waiting for players...</div>';
+                    return;
+                }
+
+                let html = '';
+                let hasWinner = false;
+
+                data.forEach(player => {
+                    const isWinner = player.score >= 1000;
+                    if (isWinner) hasWinner = true;
+
+                    html += `
+                        <div class="leaderboard-item rank-${player.rank} ${isWinner ? 'winner' : ''}">
+                            <div class="rank">#${player.rank}</div>
+                            <div class="player">
+                                ${player.player}
+                                ${isWinner ? '<span class="winner-badge">🏆 WINNER!</span>' : ''}
+                            </div>
+                            <div class="score">${player.score}</div>
+                        </div>
+                    `;
+                });
+
+                content.innerHTML = html;
+
+                if (hasWinner) {
+                    document.getElementById('status').textContent = '🎉 We have a winner! Game completed!';
+                    clearInterval(refreshInterval);
+                } else {
+                    document.getElementById('status').textContent = 'Auto-refreshing every 2 seconds';
+                }
+            } catch (error) {
+                console.error('Error fetching leaderboard:', error);
+            }
+        }
+
+        async function resetLeaderboard() {
+            try {
+                const response = await fetch('/api/reset', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('leaderboard-content').innerHTML = 
+                        '<div class="empty-state">Leaderboard reset! Waiting for new scores...</div>';
+                    document.getElementById('status').textContent = 'Auto-refreshing every 2 seconds';
+                    
+                    clearInterval(refreshInterval);
+                    startAutoRefresh();
+                }
+            } catch (error) {
+                console.error('Error resetting leaderboard:', error);
+            }
+        }
+
+        function startAutoRefresh() {
+            fetchLeaderboard();
+            refreshInterval = setInterval(fetchLeaderboard, 2000);
+        }
+
+        startAutoRefresh();
+    </script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+services:
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: gaming_leaderboard_app
+    ports:
+      - "3000:3000"
+    environment:
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+    networks:
+      - gaming_network
+
+  bot1:
+    build:
+      context: ./bot
+      dockerfile: Dockerfile
+    container_name: gaming_bot_1
+    environment:
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - BOT_NAME=Phoenix
+    networks:
+      - gaming_network
+
+  bot2:
+    build:
+      context: ./bot
+      dockerfile: Dockerfile
+    container_name: gaming_bot_2
+    environment:
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - BOT_NAME=Dragon
+    networks:
+      - gaming_network
+
+  bot3:
+    build:
+      context: ./bot
+      dockerfile: Dockerfile
+    container_name: gaming_bot_3
+    environment:
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - BOT_NAME=Shadow
+    networks:
+      - gaming_network
+
+networks:
+  gaming_network:
+    driver: bridge
