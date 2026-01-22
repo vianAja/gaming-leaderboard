@@ -12,16 +12,29 @@ const redisClient = redis.createClient({
     host: process.env.REDIS_HOST || 'redis',
     port: process.env.REDIS_PORT || 6379
   },
-  username: process.env.REDIS_USER || 'admin',
-  password: process.env.REDIS_PASSWORD || undefined
+  username: process.env.REDIS_USERNAME,
+  password: process.env.REDIS_PASSWORD
 });
 
 redisClient.on('error', err => console.log('Redis Client Error', err));
-redisClient.connect();
+redisClient.on('connect', () => console.log('Redis connected successfully'));
+
+(async () => {
+  try {
+    await redisClient.connect();
+    console.log('Redis client connected');
+  } catch (err) {
+    console.error('Failed to connect to Redis:', err);
+  }
+})();
 
 app.get('/api/leaderboard', async (req, res) => {
   try {
-    const leaderboard = await redisClient.zRevRangeWithScores('leaderboard', 0, -1);
+    if (!redisClient.isOpen) {
+      throw new Error('Redis connection is not open');
+    }
+    
+    const leaderboard = await redisClient.zRangeWithScores('leaderboard', 0, -1, { REV: true });
     const formattedLeaderboard = leaderboard.map((item, index) => ({
       rank: index + 1,
       player: item.value,
@@ -30,7 +43,7 @@ app.get('/api/leaderboard', async (req, res) => {
     res.json(formattedLeaderboard);
   } catch (error) {
     console.error('Error fetching leaderboard:', error);
-    res.status(500).json({ error: 'Failed to fetch leaderboard' });
+    res.status(500).json({ error: 'Failed to fetch leaderboard', details: error.message });
   }
 });
 

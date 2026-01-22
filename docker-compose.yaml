@@ -4,11 +4,15 @@ services:
       context: ./app
       dockerfile: Dockerfile
     container_name: gaming_leaderboard_app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     ports:
       - "3000:3000"
     environment:
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
+      - REDIS_USERNAME=${REDIS_USERNAME}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
     networks:
       - gaming_network
 
@@ -17,9 +21,13 @@ services:
       context: ./bot
       dockerfile: Dockerfile
     container_name: gaming_bot_1
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
+      - REDIS_USERNAME=${REDIS_USERNAME}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
       - BOT_NAME=Phoenix
     networks:
       - gaming_network
@@ -29,9 +37,13 @@ services:
       context: ./bot
       dockerfile: Dockerfile
     container_name: gaming_bot_2
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
+      - REDIS_USERNAME=${REDIS_USERNAME}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
       - BOT_NAME=Dragon
     networks:
       - gaming_network
@@ -41,9 +53,13 @@ services:
       context: ./bot
       dockerfile: Dockerfile
     container_name: gaming_bot_3
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     environment:
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
+      - REDIS_USERNAME=${REDIS_USERNAME}
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
       - BOT_NAME=Shadow
     networks:
       - gaming_network

@@ -38,7 +38,34 @@ mkdir -p gaming-leaderboard/bot
 cd gaming-leaderboard
 ```
 
-### 2. Create Files
+### 2. Configure Redis Credentials
+
+**IMPORTANT**: Replace the Redis credentials in `docker-compose.yml`:
+
+Open `docker-compose.yml` and replace these values in ALL service definitions (app, bot1, bot2, bot3):
+- `REDIS_USERNAME=your_redis_username` → Your actual Redis username
+- `REDIS_PASSWORD=your_redis_password` → Your actual Redis password
+
+**Alternative**: Use environment file (recommended for security)
+
+Create a `.env` file in the root directory:
+```bash
+REDIS_HOST=host.docker.internal
+REDIS_PORT=6379
+REDIS_USERNAME=your_actual_username
+REDIS_PASSWORD=your_actual_password
+```
+
+Then modify `docker-compose.yml` to use these variables:
+```yaml
+environment:
+  - REDIS_HOST=${REDIS_HOST}
+  - REDIS_PORT=${REDIS_PORT}
+  - REDIS_USERNAME=${REDIS_USERNAME}
+  - REDIS_PASSWORD=${REDIS_PASSWORD}
+```
+
+### 3. Create Files
 
 Copy each file from the artifacts into their respective locations:
 
@@ -58,7 +85,7 @@ Copy each file from the artifacts into their respective locations:
 - `package.json` (Bot package.json)
 - `bot.js` (Bot Script)
 
-### 3. Run the Application
+### 4. Run the Application
 
 ```bash
 # Build and start all containers
@@ -68,7 +95,7 @@ docker-compose up --build
 docker-compose up -d --build
 ```
 
-### 4. Access the Application
+### 5. Access the Application
 
 Open your browser and navigate to:
 ```
@@ -77,12 +104,14 @@ http://localhost:3000
 
 ## How It Works
 
-1. **Redis Container**: Stores the leaderboard data in a sorted set
+1. **Redis on Docker Host**: Uses your existing Redis instance with authentication
 2. **App Container**: Serves the web interface and API endpoints
 3. **Bot Containers (3x)**: Simulate players by adding random scores every 10 seconds
    - Phoenix (Bot 1)
    - Dragon (Bot 2)
    - Shadow (Bot 3)
+
+**Note**: Containers connect to Redis on the Docker host using `host.docker.internal`, which is automatically resolved to the host machine's IP address.
 
 ## Game Rules
 
@@ -143,6 +172,14 @@ refreshInterval = setInterval(fetchLeaderboard, 2000); // 2000ms = 2 seconds
 ```
 
 ## Troubleshooting
+
+**Redis authentication error:**
+```bash
+# Double-check your credentials in docker-compose.yml or .env file
+# Make sure there are no extra spaces or quotes
+# Test Redis connection from host:
+redis-cli -h localhost -p 6379 -a your_password --user your_username PING
+```
 
 **Port already in use:**
 ```bash
